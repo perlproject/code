@@ -7,7 +7,7 @@ void printout(const u_char *packet,int length);
 
 int main()
 {
-  char track[] = "컨설팅"; // "특기병", "컨설팅", "포렌식"
+  char track[] = "컨설팅"; 
   char name[] = "이수림";
   
   //pcap_lookupdev	
@@ -85,28 +85,28 @@ void printout(const u_char *packet,int length)
   point=0;
   i=0;
 
-  printf("dst.mac: %x",h[point]); 
+  printf("eth.smac: %x",h[point]); 
   for(i=point+1;i<point+6;i++)
   {
     printf(":%x",h[i]);
   }
   
   point+=6;
-  printf("\nsrc.mac: %x",h[point]);
+  printf("\neth.dmac: %x",h[point]);
   for(i=point+1;i<point+6;i++)
   {
     printf(":%x",h[i]); 
   }
   
   point+=20;
-  printf("\nsrc.ip: %d",h[point]);
+  printf("\nip.sip: %d",h[point]);
   for(i=point+1;i<point+4;i++)
   {
     printf(".%d",h[i]); 
   }
   
   point+=4;
-  printf("\ndst.ip: %d",h[point]);
+  printf("\nip.dip: %d",h[point]);
   for(i=point+1;i<point+4;i++)
   {
     printf(".%d",h[i]); 
@@ -114,9 +114,9 @@ void printout(const u_char *packet,int length)
   
   point+=4;
   sprintf(buf,"%x%x",h[point],h[point+1]);
-  printf("\nsrc.port: %d",*((unsigned short*)&(buf)));
+  printf("\ntcp.sport: %d",*((unsigned short*)&(buf)));
 
   point+=2;
-  printf("\ndst.port: %d",h[point+1]);
+  printf("\ntcp.dport: %d",h[point+1]);
   printf("\n--------------------------\n\n");
 }
